@@ -1,0 +1,21 @@
+<?xml version = "1.0"?>
+<project name = "deploy example" basedir = "." default = "copy">
+<target name = "init">
+<property name = "server.hosts" value = "10.10.30.28" />
+<property name = "remote.dir" value = "incoming" />
+<property name = "user.name" value = "root" />
+<property name = "user.passwd" value = "aboena" />
+<property name = "docs" value = "/home/rajanish/workspace/ant"/>
+</target>
+
+<target name = "copy" depends = "init">
+<copy file = "${basedir}/build.xml" todir = "/home/rajanish"/>
+</target>
+
+<target name = "ftp" depends = "init">
+<ftp server = "${server.hosts}" userid="${user.name}" password="${user.passwd}" passive="yes" binary="no" verbose="yes">
+<fileset dir = "${docs}"/>
+</ftp>
+</target>
+</project>
+

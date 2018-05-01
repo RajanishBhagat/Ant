@@ -1,0 +1,320 @@
+<?xml version = "1.0"?>
+<project name = "First Project" basedir="." default = "info">
+<description>This my first ANT project</description> 
+<property name = "emp.designation" value = "software engineer"/>
+<property name = "emp.companyname" value = "Cavisson system Inc."></property>
+<property file = "build.properties"/>
+<property file = "build.properties.personal"/>
+<property name = "dir.path" value="/tmp/Rajanish"/>
+
+<target name = "info" depends= "vinfo,pinfo" description="This is default target">
+<echo>My name is Rajanish Bhagat and designated as  ${emp.designation} in  ${emp.companyname}</echo>
+</target>
+
+<target name = "vinfo" description="Version Info">
+<echo>for this project ant version is ${ant.version}</echo>
+<echo>for this project java version is ${ant.java.version}</echo>
+<echo>Home directory of Ant Installation is ${ant.home} and full location of build file is ${ant.file}</echo>
+<echo>My first  project name is ${ant.project.name}</echo>
+<echo>Full location of the ANT jar file ${ant.core.lib}</echo>
+<echo>Home directory for Ant library files ${ant.library.dir}</echo> 
+</target>
+<!-- fetching data from  build.properties -->
+<target name = "pinfo">
+<echo>Employee full name is ${fullname}, current location is ${address} and home town is ${hometown}</echo>
+</target>
+
+<!--  mkdir/touch Task -->
+<target name = "mkdir" description = "used to create a directory using mkdir">
+<mkdir dir = "temp"/>  <!-- directory with the name temp will create in same path from where this target will execute -->
+<mkdir dir = "${dir.path}/container"/> <!-- directory will create inside the dir.path value means /tmp/ -->
+                   <!-- mkdir always happens with attribute dir -->    
+<touch file = "${dir.path}/container/cont"/>  <!-- used to create file -->
+</target>
+
+<!-- clean/delete task -->
+<target name = "clean" description = "used to delete the directory">
+<delete dir ="${dir.path}"/>    <!--  dir attribute is used to show directory -->
+<delete file = "rajanish"/>     <!-- file attribute is used to show file -->
+</target>
+
+<!-- copy task -->
+<target name = "copy" description = "copy task">
+<copy file ="${basedir}/build.properties" tofile ="/tmp/raj"/> 
+<!-- file copied from the current working directory and  placed in the tmp directory appeared as raj.-->
+</target>
+
+<!-- move task -->
+<target name = "move" description = "Move Task">
+<move file = "${basedir}/temp" tofile = "/tmp/bhagat"/>
+<!-- file moved from the current working directory and  placed in the tmp directory appeared as bhagat.-->
+</target>
+
+<!-- Replace task -->
+<target name="replacetoken" description = "replace is used to replace the token to the value in a given file">
+        <replace file="${basedir}/a.txt" token="@@@" value="This is so cool!"/>
+</target>
+
+<target name="concat" description = "concat is used for concatination in file,added hello world in a.txt file ">
+        <concat destfile="${basedir}/a.txt" append="yes"> Hello worlld "></concat>
+</target>
+
+<!-- get Task -->
+<target name = "getfile">
+<get src ="http://10.10.30.16:8991/4.1.11/thirdparty.4.1.11.9_Ubuntu1604_64.bin" dest="/tmp/"/>
+</target>
+
+<!-- Complile Task -->
+ <javac srcdir=”$(src.dir)” Destdir=”$(classes.dir)”/>
+
+<! Archive Task -->
+<!-- The main feature of ANT Tasks is to package the files and reduce the code by using those packaged files. Java developers package the code in jar, war and ear files. Manifest file can also be included in jar files. -->
+ <jar destfile=”$(build.dir)/$(project.name).jar” Basedir=”$(classes.dir)” Manifest=”$(etc.dir)/MANIFEST.MF”/>
+
+<!-- Sync Task -->
+<!-- Here, any changes made in the etc directory gets synced with the backup directory. Suppose create test.text file in addition to etc directory. After running the code, the backup directory also holds the test.txt file. -->
+<target name="syncfiles">
+    <sync todir="backup">
+       <fileset dir="etc"/>
+    </sync>
+</target>
+
+<!-- Create File -->
+<target name="createfile" description = "used to create a property file and append the key values">
+        <propertyfile file="dynamic.properties">
+            <entry key="date" type="date" value="now"/>
+            <entry key="buildnumber" type="int" default="0" operation="+"/>
+        </propertyfile>
+</target>
+
+<!-- -->
+<!-- File set : The fileset data types represents a collection of files. It is used as a filter to include or exclude files that match a particular pattern.For example, refer the following code. Here, the src attribute points to the source folder of the project.
+The fileset selects all .java files in the source folder except those contain the word 'Stub'. The case-sensitive filter is applied to the fileset which means a file with the name Samplestub.java will not be excluded from the fileset.
+
+<fileset dir = "${src}" casesensitive = "yes">
+   <include name = "**/*.java"/>
+   <exclude name = "**/*Stub*"/>
+</fileset>
+
+Pattern set : A pattern set is a pattern that allows to filter files or folders easily based on certain patterns. Patterns can be created using the following meta characters 
+? − Matches one character only.
+* − Matches zero or many characters.
+** − Matches zero or many directories recursively.
+
+The following example depicts the usage of a pattern set.
+<patternset id = "java.files.without.stubs">
+   <include name = "src/**/*.java"/>
+   <exclude name = "src/**/*Stub*"/>
+</patternset>
+The patternset can then be reused with a fileset as follows −
+<fileset dir = "${src}" casesensitive = "yes">
+   <patternset refid = "java.files.without.stubs"/>
+</fileset>
+
+File list
+The filelist data type is similar to the file set except the following differences −
+filelist contains explicitly named lists of files and it does not support wild cards.
+filelist data type can be applied for existing or non-existing files.
+Let us see the following example of the filelist data type. Here, the attribute webapp.src.folder points to the web application source folder of the project.
+
+<filelist id = "config.files" dir = "${webapp.src.folder}">
+   <file name = "applicationConfig.xml"/>
+   <file name = "faces-config.xml"/>
+   <file name = "web.xml"/>
+   <file name = "portlet.xml"/>
+</filelist>
+
+Filter set
+Using a filterset data type along with the copy task, you can replace certain text in all files that matches the pattern with a replacement value.
+
+A common example is to append the version number to the release notes file, as shown in the following code.
+
+<copy todir = "${output.dir}">
+   <fileset dir = "${releasenotes.dir}" includes = "**/*.txt"/>
+   
+   <filterset>
+      <filter token = "VERSION" value = "${current.version}"/>
+   </filterset>
+</copy>
+
+In this Code −
+The attribute output.dir points to the output folder of the project.
+The attribute releasenotes.dir points to the release notes folder of the project.
+The attribute current.version points to the current version folder of the project.
+The copy task, as the name suggests, is used to copy files from one location to another.
+
+
+Path :
+The path data type is commonly used to represent a class-path. Entries in the path are separated using semicolons or colons. However, these characters are replaced at the run-time by the executing system's path separator character.
+
+The classpath is set to the list of jar files and classes in the project, as shown in the example below.
+
+<path id = "build.classpath.jar">
+   <pathelement path = "${env.J2EE_HOME}/${j2ee.jar}"/>
+   
+   <fileset dir = "lib">
+      <include name = "**/*.jar"/>
+   </fileset>
+</path>
+In this code −
+
+The attribute env.J2EE_HOME points to the environment variable J2EE_HOME.
+
+The attribute j2ee.jar points to the name of the J2EE jar file in the J2EE base folder.ile list
+The filelist data type is similar to the file set except the following differences −
+filelist contains explicitly named lists of files and it does not support wild cards.
+filelist data type can be applied for existing or non-existing files.
+
+DirSet  :
+ It applies various patterns to the directory structure by taking in some directories and removing other directories.
+<dirset dir="build">
+    <patternset id="classes">
+        <include name="**/classes"/>
+        <exclude name="**/*Test*"/>
+    <patternset>
+</dirset>
+
+or;
+
+<dirset dir="build">
+        <include name="**/classes"/>
+        <exclude name="**/*Test*"/>
+</dirset>
+
+-->
+<!-- Run one build.xml from anther build.xml using Ant.-->
+<property name="smoke.ant.file" value="${basedir}/smoke/build.xml"/>
+
+<target name="smoke" depends="get-build-info, nodeserver" description="Run Smoke testsuite">
+      <ant antfile="${smoke.ant.file}" target="smoke" useNativeBasedir="true"/>
+</target>
+
+
+<!--Copy a single local file to a remote machine with separate password attribute -->
+<scp file="myfile.txt" todir="user@somehost:/home/chuck" password="password"/>
+
+<!-- Copy a set of files to a directory -->
+<scp todir="user:password@somehost:/home/chuck">
+  <fileset dir="src_dir">
+    <include name="**/*.java"/>
+  </fileset>
+</scp>
+
+<!-- FTP Working -->
+<!-- Sending files -->
+<ftp server="ftp.apache.org"
+     userid="anonymous"
+     password="me@myorg.com">
+    <fileset dir="htdocs/manual"/>
+</ftp>
+
+<ftp server="ftp.apache.org"
+     port="2121"
+     remotedir="/pub/incoming"
+     userid="coder"
+     password="java1"
+     passive="yes"
+     depends="yes"
+     binary="no">
+    <fileset dir="htdocs/manual">
+        <include name="**/*.html"/>
+    </fileset>
+</ftp>
+
+<!-- Getting files -->
+<ftp action="get"
+     server="ftp.apache.org"
+     userid="anonymous"
+     password="me@myorg.com">
+    <fileset dir="htdocs/manual">
+        <include name="**/*.html"/>
+    </fileset>
+</ftp>
+<!-- deleteing files -->
+<ftp action="del"
+     server="ftp.apache.org"
+     userid="anonymous"
+     password="me@myorg.com">
+    <fileset>
+        <include name="**/*.tmp"/>
+    </fileset>
+</ftp>
+
+<!-- Listing files -->
+<ftp action="list"
+     server="ftp.apache.org"
+     userid="anonymous"
+     password="me@myorg.com"
+     listing="data/ftp.listing">
+    <fileset>
+        <include name="**"/>
+    </fileset>
+</ftp>
+
+<!--  create directories -->
+<ftp action="mkdir"
+     server="ftp.apache.org"
+     userid="anonymous"
+     password="me@myorg.com"
+     remotedir="some/remote/dir"/>
+
+<!-- Remove directories -->
+<ftp action="rmdir"
+     server="ftp.apache.org"
+     userid="anonymous"
+     password="me@myorg.com"
+     remotedir="/somedir" >
+    <fileset>
+        <include name="dira"/>
+        <include name="dirb/**"/>
+    </fileset>
+</ftp> 
+<!-- get-build-info -->
+<target name="get-build-info" description="Get release and build information">
+    <exec executable="bash" outputproperty="release.info">
+      <arg value="-c"/>
+      <arg value="cat ${ns.wdir}/etc/version|head -1|awk '{print $2}'"/>
+    </exec>
+    <exec executable="bash" outputproperty="build.info">
+      <arg value="-c"/>
+      <arg value="cat ${ns.wdir}/etc/version|tail -1|awk '{print $2}'"/>
+    </exec>
+    <echo message="Current Build: R${release.info}.B${build.info}"/>
+  </target>
+
+<!--  executable for windows -->
+ <exec executable="cmd" os="Windows XP">
+      <arg value="/C"/>
+      <arg value="${reportUrl}"/>
+    </exec>
+<!-- sshexec on servers -->
+<!-- nodejs installation on server -->
+ <target name="nodeserver" description="start netjsagent">
+
+ <sshexec host="${node.server}"                                                              
+          username="${node.user}"                                                          
+          password="${node.passwd}"                                                        
+          trust="true"                                                                   
+          command="rm -f ${node.agent.logs}/*.*"/>
+ <sshexec host="${node.server}"                                                              
+          username="${node.user}"                                                          
+          password="${node.passwd}"                                                        
+          trust="true"                                                                   
+          command="${node.shell} stop install start status"/>
+ </target>
+
+<!--When this given xml file is executed, a property file “dynamic.properties” appears and displays the date, time and count incrementing each time            -->
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Property File Example" default="createfile" basedir=".">
+
+    <target name="createfile">
+        <propertyfile file="dynamic.properties">
+            <entry key="date" type="date" value="now"/>
+            <entry key="buildnumber" type="int" default="0" operation="+"/>
+        </propertyfile>
+    </target>
+
+</project>
+
+
+</project>
