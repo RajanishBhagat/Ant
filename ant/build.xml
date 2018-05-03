@@ -269,6 +269,12 @@ or;
         <include name="dirb/**"/>
     </fileset>
 </ftp> 
+
+<target name = "ftp" depends = "init">
+<ftp server = "${server.hosts}" userid="${user.name}" password="${user.passwd}" passive="yes" binary="no" verbose="yes">
+<fileset dir = "${docs}"/>
+</ftp>
+
 <!-- get-build-info -->
 <target name="get-build-info" description="Get release and build information">
     <exec executable="bash" outputproperty="release.info">

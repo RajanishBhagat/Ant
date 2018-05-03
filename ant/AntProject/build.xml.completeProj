@@ -1,11 +1,11 @@
 <?xml version=”1.0” ?>
 <project name=”JarBuild” basedir=”.” Default=”jarfile”>
     <target name=”init” description=”Initializes properties”>
-        <propery name=”project.name” value=”helloWorld”/>
-        <propery name=”src.dir” value=”src”/>
-        <propery name=”build.dir” value=”build”/>
-        <propery name=”classes.dir” value=”$(build.dir)/classes”/>
-                <propery name=”etc.dir” value=”etc”/>
+        <property name=”project.name” value=”helloWorld”/>
+        <property name=”src.dir” value=”src”/>
+        <property name=”build.dir” value=”build”/>
+        <property name=”classes.dir” value=”$(build.dir)/classes”/>
+                <property name=”etc.dir” value=”etc”/>
         </target>
  
         <target name=”prepare” description=”Creates the build and classes directories” depends=”init”>
