@@ -7,7 +7,7 @@ Verifying Apache Ant Installation, using command ==>>  ant -version
 As ANT deploys easily, integrates with the database and helps in email & sound notifications of the build completion, ANT has become a powerful build tool.
 ANT Build Tool is helpful in automating large software projects.
 
-Functions : 
+Ant Functions : 
 Control management tasks
 Control compiling code build process
 Creates .jar and .war files
@@ -17,6 +17,7 @@ Initiate email reporting
 Deploy to servers
 Interact with source code management systems
 
-
+Note : ANT file name should with name build.xml then execute build file like  { ant build.xml }
+       or if any other file name then used to execute { ant -f build_project.xml}
 
 
